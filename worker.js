@@ -38,6 +38,10 @@ async function handlePush(data, botToken, chatId, threadId) {
 
   if (commits.length === 0) return;
 
+  const authorName = data.pusher?.name || commits[0].author?.name || "unknown";
+  const authorUsername = data.sender?.login || commits[0].author?.username || "unknown";
+  const commitCount = commits.length;
+
   let msg;
 
   if (commits.length === 1) {
@@ -47,14 +51,15 @@ async function handlePush(data, botToken, chatId, threadId) {
 
 📦 Repo: ${escMd(repo)}
 🌿 Branch: ${escMd(branch)}
-👤 Author: ${escMd(commit.author?.name)}
+👤 Author: ${escMd(authorName)} \\(${escMd(authorUsername)}\\)
+🔢 Commits: ${escMd(String(commitCount))}
 🕐 Time: ${escMd(formatDate(commit.timestamp))}
 📝 Message: ${escMd(truncate(commit.message, 300))}
 ✅ Status: Success
 🔗 [View Commit](${commit.url})`;
   } else {
     const commitLines = commits.map((c, i) =>
-      `${i + 1}\\. ${escMd(truncate(c.message, 100))} \\— ${escMd(c.author?.name)}`
+      `${i + 1}\\. ${escMd(truncate(c.message, 100))} \\— ${escMd(authorName)}`
     ).join("\n");
 
     msg =
@@ -62,6 +67,8 @@ async function handlePush(data, botToken, chatId, threadId) {
 
 📦 Repo: ${escMd(repo)}
 🌿 Branch: ${escMd(branch)}
+👤 Author: ${escMd(authorName)} \\(${escMd(authorUsername)}\\)
+🔢 Commits: ${escMd(String(commitCount))}
 🕐 Time: ${escMd(formatDate(commits[commits.length - 1].timestamp))}
 ✅ Status: Success
 
